@@ -15,7 +15,7 @@ void printCompare(std::map<int, int> &hist, std::map<int, int> &new_hist);
 #define DPRINTINFO(x,y)
 #endif
 
-#define SAMPLE_SIZE 1000000
+#define SAMPLE_SIZE 10e6
 
 int main()
 {
@@ -30,8 +30,8 @@ int main()
     hist[11] = 2;
     hist[13] = 1;
     hist[15] = 1;
+    /* make intervals */
     std::map<int, std::pair<int,int>> intervals; /*distjoint, weighted according to hist */
-    /* make distribution */
     int max, length, upper_bound; 
     int lower_bound = 1;
     std::map<int, int>::iterator it;
@@ -61,9 +61,10 @@ void printInfo(std::map<int, int> &hist, std::map<int, std::pair<int,int>> &inte
     std::map<int, std::pair<int,int>>::iterator it2;
     it = hist.begin();
     it2 = intervals.begin();
+    std::printf("%7s %4s\t%s\n", "value", "freq", "mapped range");
     while(it != hist.end()) {
-        std::cout << it->first << " : " << it->second << "\t[" << 
-            it2->second.first << ", " << it2->second.second << "]\n";
+        std::printf("%3d : %3d\t[%3d, %3d]\n", it->first, it->second,
+                it2->second.first, it2->second.second);
         it++;
         it2++;
     }
@@ -86,12 +87,14 @@ int findEntry(int loc, std::map<int, std::pair<int,int>> &intervals){
 void printCompare(std::map<int, int> &hist, std::map<int, int> &new_hist) {
     std::map<int, int>::iterator it = hist.begin();
     std::map<int, int>::iterator it2 = new_hist.begin();
-    std::cout << "\t hist \t new_hist" << std::endl;
+    std::printf("%40s\n","Proportion comparisons");
+    std::printf("\thist\t\tnew_hist\tabs diff\n");
+    double first,second, diff;
     while(it != hist.end()) {
-        std::cout << it->first << " :\t" <<
-            static_cast<double>(it->second)/20 << "\t" <<
-            static_cast<double>(it2->second)/SAMPLE_SIZE <<
-            std::endl;
+        first=static_cast<double>(it->second)/20;
+        second=static_cast<double>(it2->second)/SAMPLE_SIZE;
+        diff = std::abs(first - second);
+        std::printf("%3d :\t%.3e\t%.3e\t%.3e\n",it->first, first, second, diff);
         it++;
         it2++;
     }
